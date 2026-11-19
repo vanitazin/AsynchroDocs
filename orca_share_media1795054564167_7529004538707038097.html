@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AsynchroDocs: Document Request and Monitoring System with Process Guidance and Notifications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef4f5;
+  --panel:#e1edef;
+  --card:#fff;
+  --tx:#10303a;
+  --mut:#5d7a83;
+  --bd:#d5e3e6;
+  --pri:#0e7c8b;
+  --deep:#0b3a4a;
+  --acc:#e5583a;
+  --red:#a23b22;
+  --rb:#fff0eb;
+  --gb:#e3f6f3;
+  --maroon:#0b3a4a;
+}
+
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme:dark;
+    --bg:#0b1a20;
+    --panel:#163038;
+    --card:#12262e;
+    --tx:#e3f0f2;
+    --mut:#8fb0b8;
+    --bd:#244049;
+    --pri:#38b6c6;
+    --red:#ffb199;
+    --rb:#3a2620;
+    --gb:#14342f;
+    --maroon:#e3f0f2;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --bg:#0b1a20;
+  --panel:#163038;
+  --card:#12262e;
+  --tx:#e3f0f2;
+  --mut:#8fb0b8;
+  --bd:#244049;
+  --pri:#38b6c6;
+  --red:#ffb199;
+  --rb:#3a2620;
+  --gb:#14342f;
+  --maroon:#e3f0f2;
+}
+
+.ib {
+  width:36px;
+  height:36px;
+  padding:0;
+  font-size:16px;
+  line-height:1;
+  border-radius:50%;
+  position:relative;
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.ib * {
+  line-height:1;
+}
+
+.ib .cnt {
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  margin:0;
+}
+
+#nav {
+  display:flex;
+  gap:8px;
+}
+
+.bar {
+  gap:8px;
+}
+
+.bar .t {
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-padding-top:env(safe-area-inset-top,0px);
+}
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--tx);
+  font:14px/1.5 "Plus Jakarta Sans",system-ui,"Segoe UI",Roboto,sans-serif;
+}
+
+.bar {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  background:var(--deep);
+  color:#fff;
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:5;
+}
+
+.bar .t {
+  flex:1;
+  font-weight:800;
+  font-size:13px;
+}
+
+.wrap {
+  max-width:960px;
+  margin:0 auto;
+  padding:20px 16px 8px;
+}
+
+#dash,#reg {
+  max-width:720px;
+}
+
+.btn {
+  border:0;
+  border-radius:999px;
+  padding:7px 15px;
+  color:#fff;
+  cursor:pointer;
+  font:600 12px inherit;
+  font-family:inherit;
+  background:var(--pri);
+}
+
+.btn.g {
+  background:#1f9d6b;
+}
+
+.btn.r {
+  background:var(--acc);
+}
+
+.btn.o {
+  background:#f2a93b;
+  color:#3a2400;
+}
+
+.btn.x {
+  background:var(--panel);
+  color:var(--tx);
+}
+
+.btn.lg {
+  font-size:14px;
+  padding:11px 24px;
+}
+
+.bar .btn.x {
+  background:#ffffff26;
+  color:#fff;
+}
+
+.hero {
+  background:linear-gradient(135deg,var(--deep),#127a86);
+  color:#fff;
+  border-radius:24px;
+  padding:28px 24px;
+  margin-bottom:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  text-align:left;
+}
+
+.hero h1 {
+  font-size:clamp(26px,6vw,40px);
+  font-weight:800;
+  line-height:1.1;
+  margin:8px 0;
+}
+
+.hero small,.hero p {
+  color:#cfe9ed;
+  display:block;
+  margin:0 0 8px;
+}
+
+.hero .btn.g {
+  background:#ffd98a;
+  color:#3a2a00;
+}
+
+.list {
+  max-width:560px;
+  display:grid;
+  gap:12px;
+}
+
+.list .h {
+  color:var(--mut);
+  font-weight:600;
+  padding:0 4px;
+}
+
+.list button {
+  background:var(--card);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  padding:18px;
+  text-align:left;
+  font:700 14px inherit;
+  font-family:inherit;
+  color:var(--tx);
+  cursor:pointer;
+  box-shadow:0 2px 8px #0b3a4a14;
+  transition:transform .15s;
+}
+
+.list button:hover:not([disabled]) {
+  transform:translateY(-2px);
+}
+
+.list small {
+  color:var(--mut);
+  font-weight:400;
+}
+
+#home {
+  display:grid;
+  gap:14px;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+}
+
+#home .hero,#home .adv {
+  grid-column:1/-1;
+}
+
+.adv {
+  background:var(--rb);
+  border-left:6px solid var(--acc);
+  border-radius:14px;
+  color:var(--red);
+  padding:16px 40px 16px 18px;
+  position:relative;
+  margin:0;
+}
+
+.adv h2 {
+  margin:0 0 6px;
+  font-size:16px;
+  font-weight:800;
+}
+
+.adv.g {
+  background:var(--gb);
+  border-left-color:#1f9d6b;
+  color:var(--tx);
+}
+
+.vid {
+  width:100%;
+  max-width:420px;
+  aspect-ratio:16/9;
+  margin:10px 0 0;
+  background:linear-gradient(135deg,#127a86,#0b3a4a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  border-radius:14px;
+}
+
+.vid i {
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:#fffd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-style:normal;
+  font-size:22px;
+  color:#0b3a4a;
+}
+
+.cx {
+  position:absolute;
+  right:10px;
+  top:6px;
+  cursor:pointer;
+  color:var(--mut);
+  background:none;
+  border:0;
+  font-size:20px;
+}
+
+.sec {
+  background:var(--card);
+  border:1px solid var(--bd);
+  border-top:5px solid var(--pri);
+  border-radius:20px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+
+.sec h3 {
+  font-size:18px;
+  font-weight:800;
+  margin:0 0 6px;
+}
+
+.sec p {
+  margin:0 0 14px;
+  font-size:13px;
+  color:var(--mut);
+  flex:1;
+}
+
+.ov {
+  position:fixed;
+  inset:0;
+  background:#06161bb8;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:auto;
+  z-index:20;
+}
+
+.ov.on {
+  display:flex;
+}
+
+.md {
+  background:var(--card);
+  width:100%;
+  max-width:560px;
+  max-height:90vh;
+  overflow:auto;
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -8px 30px #0006;
+}
+
+.md .mh {
+  display:flex;
+  justify-content:space-between;
+  padding:18px;
+  border-bottom:1px solid var(--bd);
+  color:var(--tx);
+  font-weight:800;
+  font-size:15px;
+}
+
+.md .mb {
+  padding:14px 18px;
+  font-size:13px;
+}
+
+.md .mf {
+  padding:12px 18px 18px;
+  text-align:right;
+}
+
+.md input,.md select {
+  width:100%;
+}
+
+.docs {
+  max-height:55vh;
+  overflow:auto;
+  border:1px solid var(--bd);
+  border-radius:12px;
+}
+
+.docs div {
+  padding:9px 12px;
+  border-bottom:1px solid var(--bd);
+  font-size:13px;
+}
+
+.docs div:first-child {
+  font-weight:800;
+  background:var(--panel);
+}
+
+.box {
+  background:var(--panel);
+  border-radius:14px;
+  padding:12px;
+  margin:10px 0;
+}
+
+.box b.t {
+  display:block;
+  font-size:14px;
+  padding-bottom:6px;
+  margin-bottom:6px;
+  border-bottom:1px solid var(--bd);
+}
+
+.n {
+  display:inline-block;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--pri);
+  color:#fff;
+  font-size:10px;
+  text-align:center;
+  line-height:18px;
+  margin-right:6px;
+}
+
+.bd {
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+}
+
+.s0 {
+  background:#6b7f86;
+}
+
+.s1 {
+  background:#f2a93b;
+  color:#3a2400;
+}
+
+.s2 {
+  background:#1a9bb0;
+}
+
+.s3 {
+  background:#2f6fd0;
+}
+
+.s4 {
+  background:#1f9d6b;
+}
+
+.sp {
+  background:var(--acc);
+}
+
+label {
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  margin:10px 0 3px;
+}
+
+label b {
+  color:var(--acc);
+}
+
+input,select,textarea {
+  font:inherit;
+  font-size:14px;
+  padding:10px 12px;
+  border:1.5px solid var(--bd);
+  border-radius:12px;
+  background:var(--bg);
+  color:var(--tx);
+  width:100%;
+}
+
+input:focus,select:focus,textarea:focus {
+  outline:2px solid var(--pri);
+  outline-offset:1px;
+}
+
+input[type=radio],input[type=checkbox] {
+  width:auto;
+  margin-right:6px;
+}
+
+.fg {
+  border-left:4px solid var(--acc);
+  padding:2px 10px;
+  font-weight:800;
+  font-size:15px;
+  margin:26px 0 4px;
+}
+
+.row {
+  display:flex;
+  gap:10px;
+}
+
+.row>* {
+  flex:1;
+}
+
+.warn {
+  background:#fff3d1;
+  color:#6b4b00;
+  border-radius:12px;
+  padding:9px 14px;
+  font-size:12px;
+  font-weight:600;
+  display:inline-block;
+}
+
+#rf,#dash form {
+  background:var(--card);
+  border:1px solid var(--bd);
+  border-radius:22px;
+  padding:4px 20px 22px;
+  margin-top:12px;
+}
+
+.err {
+  color:var(--acc);
+  font-size:12px;
+}
+
+.ok {
+  color:#1f9d6b;
+  font-size:13px;
+  font-weight:600;
+}
+
+.card {
+  border:1px solid var(--bd);
+  border-left:6px solid var(--pri);
+  background:var(--card);
+  border-radius:18px;
+  padding:14px;
+  margin:10px 0;
+}
+
+.card .r1 {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.card .a {
+  margin-top:10px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+footer {
+  background:var(--deep);
+  color:#b9d6db;
+  text-align:center;
+  font-size:12px;
+  padding:22px 16px;
+  margin-top:auto;
+}
+
+body {
+  min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+}
+
+.wrap {
+  width:100%;
+  padding-bottom:28px;
+}
+
+footer a {
+  color:#fff;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.toast {
+  position:fixed;
+  left:50%;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  transform:translateX(-50%);
+  background:#0b3a4a;
+  color:#fff;
+  padding:10px 18px;
+  border-radius:999px;
+  font-size:13px;
+  z-index:40;
+  display:none;
+}
+
+.hide {
+  display:none!important;
+}
+
+.cnt {
+  background:#e5583a;
+  color:#fff;
+  border-radius:999px;
+  font-size:10px;
+  padding:0 5px;
+  margin-left:4px;
+}
+
+.chat {
+  max-height:40vh;
+  overflow:auto;
+  background:var(--panel);
+  border-radius:14px;
+  padding:10px;
+  margin:8px 0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.bub {
+  background:var(--card);
+  border-radius:14px;
+  padding:8px 12px;
+  max-width:85%;
+  align-self:flex-start;
+}
+
+.bub.me {
+  background:var(--pri);
+  color:#fff;
+  align-self:flex-end;
+}
+
+.bub small {
+  opacity:.7;
+  font-size:10px;
+  display:block;
+}
+
+
+.bar .t { font-size: 21px; font-weight: 800; letter-spacing: -.3px; }
+.adv h2 { padding-right: 36px; }
+.cx { width: 28px; height: 28px; font-size: 11px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform .2s; }
+.adv.col .cx { transform: rotate(180deg); }
+.adv.col .ab { display: none; }
+.adv.col h2 { margin: 0; }
+.rt { font-size: 26px; font-weight: 800; margin: 4px 0; }
+.rs { color: var(--mut); margin: 0 0 14px; }
+#rf { background: none !important; border: 0 !important; padding: 0 !important; margin-top: 0 !important; }
+.fs { background: var(--card); border: 1px solid var(--bd); border-radius: 20px; padding: 16px; margin: 14px 0; }
+.fs h4 { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; margin: 0 0 6px; }
+.fs h4 i { width: 26px; height: 26px; border-radius: 50%; background: var(--pri); color: #fff; font-style: normal; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.fld { margin-top: 10px; }
+.fld label { margin: 0 0 4px; }
+.hint { color: var(--mut); font-size: 11px; display: block; margin-top: 3px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.g2b { display: grid; grid-template-columns: 2fr 1fr; gap: 0 12px; }
+.g3 { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px; }
+.chk { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; font-size: 13px; margin: 10px 0; }
+.chk input { margin: 3px 0 0; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seg label { margin: 0; }
+.seg input { display: none; }
+.seg span { display: block; text-align: center; padding: 10px 6px; border: 1.5px solid var(--bd); border-radius: 12px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.seg input:checked + span { background: var(--pri); border-color: var(--pri); color: #fff; }
+.chip { display: inline-block; background: var(--panel); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; margin-top: 6px; }
+#rerr:not(:empty) { background: var(--rb); border-left: 4px solid var(--acc); padding: 10px 12px; border-radius: 10px; margin: 12px 0; }
+</style></head><body>
+<div class="bar"><button class="btn x ib" id="back" onclick="go('pick')" aria-label="Back">&#8592;</button><span class="t"><span id="ttl">Online Document Request</span></span><button class="btn x ib" id="thm" onclick="theme()" aria-label="Toggle dark mode"></button><span id="nav"></span></div>
+
+<!-- PICK -->
+<div id="pick" class="wrap"><div class="hero"><img src="Images/Logo.png" alt="" width="74" height="74" onerror="this.style.display='none'"><h1>AsynchroDocs</h1><small>Document Request and Monitoring System with Process Guidance and Notifications</small><small>Mariveles National Highschool - Camaya &bull; Senior High School</small></div>
+<div class="list"><div class="h">&#10140; Select your Registrar:</div>
+<button onclick="go('home')">&#128278; Mariveles National Highschool - Camaya Registrar (Main)<br><small>(Senior High School - Grade 11 &amp; 12)</small></button>
+</div></div>
+
+<!-- HOME -->
+<div id="home" class="wrap hide"><div class="hero"><img src="Images/Logo.png" alt="" width="64" height="64" onerror="this.style.display='none'">
+<h1>Request Documents Online!</h1><small>For Students and Graduates of Mariveles National Highschool - Camaya (Senior High School)<br><i>For Concerns, email us at registrar@mnhs-camaya.edu.ph</i></small><p style="color:var(--mut);font-size:15px">Request, Pay, Submit the Requirements, Monitor, and Claim.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn g lg" onclick="start()">Request a Document</button><button class="btn lg" style="background:#ffffff33" onclick="inst()">Read Instructions</button></div></div>
+<div class="adv" id="a1"><button class="cx" onclick="tg(this)" aria-label="Collapse">&#9650;</button><h2>ADVISORY TO OUR CLIENTS</h2><div class="ab">As part of our monitoring and evaluation, and to improve the quality of our system and services, all requests in the <b>Online Document Request System (ODRS)</b> with incomplete and invalid requirements shall be automatically deleted after <b>90 days</b> of noncompliance. Please be advised that the deletion from the system may be done without prior notice or approval from the requesting client.<p>Please be guided accordingly.</p></div></div>
+<div class="adv g" id="a2"><button class="cx" onclick="tg(this)" aria-label="Collapse">&#9650;</button><h2 style="font-size:16px">WATCH HOW TO REQUEST YOUR DOCUMENTS</h2><div class="ab"><b>Watch this video to know the steps on how to submit and monitor your request</b><div class="vid" style="position:relative;overflow:hidden" onclick="toast('Video tutorial coming soon')"><img src="Videos/Instructions.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"><i style="position:relative">&#9654;</i></div></div></div>
+<div class="sec"><h3>Document Requesting</h3><p>Requesting of documents is now available online. Create an account and upload your photo to get access to the Online Document Request Page.</p><button class="btn" onclick="docs()">View details &raquo;</button></div>
+<div class="sec"><h3>Notifications &amp; Private Chat</h3><p>Get notified on every update and message the Registrar privately. Turn in your requirements and receive the document release date.</p><button class="btn" onclick="guide()">View details &raquo;</button></div>
+<div class="sec"><h3>Request Monitoring</h3><p>Check the latest status updates on your request. Easier communication when additional requirement is needed and notification when requested documents are ready for pick-up.</p><button class="btn" onclick="flow()">View details &raquo;</button></div></div>
+
+<!-- REGISTER -->
+<div id="reg" class="wrap hide">
+<h2 class="rt">Create your account</h2><p class="rs">Register to request documents, monitor their status, and message the Registrar.</p>
+<form id="rf" onsubmit="return reg(event)" novalidate>
+<div class="fs"><h4><i>1</i>Account Type</h4>
+<div class="fld"><label>Register as <b>*</b></label><select id="r_role" onchange="setRole()"><option value="student">Learner / Student</option><option value="registrar">Registrar Staff</option><option value="admin">Admin</option></select></div>
+<div class="warn" style="margin-top:10px">Learner accounts are for MNHS - Camaya Senior High School students/graduates only. Staff and Admin accounts require an access code.</div></div>
+<div class="fs"><h4><i>2</i>Account Information</h4>
+<div class="fld"><label>Email Address <b>*</b></label><input id="r_email" type="email" placeholder="you@email.com"><small class="hint">Do not use the email address of another student.</small></div>
+<div class="fld"><label>Confirm Email <b>*</b></label><input id="r_email2" type="email" placeholder="Repeat email"></div>
+<div class="g2"><div class="fld"><label>Password <b>*</b></label><input id="r_pw" type="password" placeholder="Min. 6 characters"></div><div class="fld"><label>Confirm Password <b>*</b></label><input id="r_pw2" type="password" placeholder="Repeat password"></div></div>
+<label class="chk"><input type="checkbox" onchange="shr(this)"><span>Show password</span></label>
+<div class="g2"><div class="fld"><label>Mobile Number <b>*</b></label><input id="r_mob" inputmode="tel" placeholder="09XXXXXXXXX"></div><div class="fld"><label>Phone Number</label><input id="r_tel" placeholder="Optional"></div></div>
+<div id="stf" class="hide g2"><div class="fld"><label>Employee ID <b>*</b></label><input id="r_emp" placeholder="Employee ID"></div><div class="fld"><label>Access Code <b>*</b></label><input id="r_code" type="password" placeholder="From the administrator"></div></div></div>
+<div class="fs"><h4><i>3</i>Personal Information</h4>
+<div class="g2"><div class="fld"><label>Last Name <b>*</b></label><input id="r_ln" placeholder="Last name"></div><div class="fld"><label>First Name <b>*</b></label><input id="r_fn" placeholder="First name"></div></div>
+<div class="fld"><label>Middle Name</label><input id="r_mn" placeholder="Middle name"></div>
+<label class="chk"><input type="checkbox" id="r_nomn" onchange="r_mn.disabled=this.checked"><span>I don't have a middle name</span></label>
+<div id="stux"><div class="fld"><label>Date of Birth <b>*</b></label><div class="g3"><select id="r_m"></select><select id="r_d"></select><select id="r_y"></select></div></div>
+<div class="fld"><label>Permanent Address <b>*</b></label><textarea id="r_ad" rows="2" placeholder="No. / Street / Barangay / City / Zip Code"></textarea></div></div></div>
+<div class="fs" id="edu"><h4><i>4</i>Educational Information</h4>
+<span class="chip">Registrar: Senior High School (MNHS - Camaya)</span>
+<div class="fld"><label>Program Status <b>*</b></label><div class="seg"><label><input type="radio" name="ps" value="Graduated" checked onchange="ps()"><span>Graduated</span></label><label><input type="radio" name="ps" value="Not Graduate" onchange="ps()"><span>Not Graduate</span></label></div></div>
+<div class="fld"><label>Strand / Track <b>*</b></label><select id="r_st"><option value="">-Select-</option><option>STEM</option><option>ABM</option><option>HUMSS</option><option>GAS</option><option>TVL - ICT</option><option>TVL - Home Economics</option><option>TVL - Industrial Arts</option><option>Sports Track</option><option>Arts and Design Track</option></select></div>
+<div class="g2"><div class="fld"><label id="yl">Year Graduated <b>*</b></label><select id="r_yg"></select></div><div class="fld"><label>Year Admitted <b>*</b></label><select id="r_ya"></select></div></div>
+<div class="g2"><div class="fld"><label>Admitted As <b>*</b></label><select id="r_as"><option>Regular</option><option>Transferee</option><option>Balik-Aral</option></select></div><div class="fld"><label>LRN <b>*</b></label><input id="r_lrn" inputmode="numeric" maxlength="12" placeholder="12-digit LRN"></div></div>
+<div class="g2b"><div class="fld"><label>Junior High School <b>*</b></label><input id="r_jhs" placeholder="School name"></div><div class="fld"><label>Year <b>*</b></label><select id="r_jy"></select></div></div>
+<div class="g2b"><div class="fld"><label>Elementary School <b>*</b></label><input id="r_el" placeholder="School name"></div><div class="fld"><label>Year <b>*</b></label><select id="r_ey"></select></div></div></div>
+<div class="fs"><h4><i>5</i>Agreements</h4>
+<label class="chk" id="c1w"><input type="checkbox" id="c1"><span>I'm a student/graduate of Mariveles National Highschool - Camaya (Senior High School)</span></label>
+<label class="chk"><input type="checkbox" id="c2"><span>This is my first and only AsynchroDocs account.</span></label>
+<label class="chk"><input type="checkbox" id="c3"><span>I understood and agree to the <a href="#" style="color:var(--pri)" onclick="return terms()">Terms of Use</a> and <a href="#" style="color:var(--pri)" onclick="return terms()">Privacy Statement</a>.</span></label></div>
+<div class="err" id="rerr"></div>
+<button class="btn g lg" type="submit" style="width:100%">Create Account</button></form></div>
+
+<!-- DASH -->
+<div id="dash" class="wrap hide"><div class="hero"><b id="wl"></b><small id="wl2"></small></div><div id="dbody"></div></div>
+
+<footer>&copy; 2026 Mariveles National Highschool - Camaya | <a onclick="terms()">Terms of Use</a> | <a onclick="terms()">Privacy Statement</a><br>Contact us at: Registrar's Office, Mariveles National Highschool - Camaya, Mariveles, Bataan</footer>
+
+<div class="ov" id="ov" onclick="if(event.target==this)cl()"><div class="md"><div class="mh"><span id="mt"></span><span style="cursor:pointer;color:#999" onclick="cl()">&times;</span></div><div class="mb" id="mb"></div><div class="mf" id="mf"><button class="btn x" onclick="cl()">Close</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* AsynchroDocs - Document Request and Monitoring System with Process Guidance and Notifications */
+  var $ = function (i) {
+      return document.getElementById(i);
+  };
+  var mem = {};
+
+  /* ===== Storage ===== */
+
+  function ld(k, d) {
+      try {
+          var v = localStorage.getItem(k);
+          return v ? JSON.parse(v) : d;
+      }
+      catch (e) {
+          return mem[k] || d;
+      }
+  }
+  function sv(k, v) {
+      try {
+          localStorage.setItem(k, JSON.stringify(v));
+      }
+      catch (e) {
+          mem[k] = v;
+      }
+  }
+  var DOCS = [["Form 137 / SF10 (Permanent Record) - for transfer", 50], ["Form 138 (Report Card) - Certified True Copy", 30], ["Certification of Enrollment", 50], ["Certification of Graduation / Completion of SHS", 75], ["Certification of Grades", 50], ["Certification of General Weighted Average (G.W.A.)", 50], ["Certificate of Good Moral Character", 50], ["Certificate of Honors / Academic Award", 50], ["Diploma - Certified True Copy", 100], ["Diploma - Replacement Copy", 150], ["Certification of Medium of Instruction (English)", 75], ["Certification of Strand / Track Completed", 50], ["Certification of SHS Voucher Program (Recipient)", 50], ["Certification of Non-Issuance of Special Order", 50], ["Certificate of Transfer Credential (Honorable Dismissal)", 75], ["Certification of Subject Description", 75], ["CAV - DepEd Authentication", 150], ["Re-print Credentials / Counter Checking", 30], ["Retrieval of Unclaimed Request", 30], ["Other Special Requests", 100]];
+  var ST = ["For Clearance", "For Receiving", "For Evaluation/Processing", "Ready for Pickup", "Released"];
+  var cur = null;
+  function toast(m) {
+      var t = $("toast");
+      t.textContent = m;
+      t.style.display = "block";
+      clearTimeout(t._t);
+      t._t = setTimeout(function () {
+          t.style.display = "none";
+      }, 2600);
+      return false;
+  }
+
+  /* ===== Modals & informational dialogs ===== */
+
+  function md(t, b, f) {
+      $("mt").textContent = t;
+      $("mb").innerHTML = b;
+      $("mf").innerHTML = f || '<button class="btn x" onclick="cl()">Close</button>';
+      $("ov").classList.add("on");
+  }
+  function cl() {
+      $("ov").classList.remove("on");
+  }
+  function docs() {
+      md("Document Requesting", '<div class="docs"><div>Documents Available for Online Request</div>' + DOCS.map(function (d) {
+          return "<div>" + d[0] + "</div>";
+      }).join("") + "</div>");
+  }
+  function flow() {
+      md("Process Status Flow", '<i>After <b>Submission</b> of Request,</i><hr><p><span class="n">1</span><span class="bd s0">For Clearance</span> - The requester should settle the deficiency/ies to necessary office/s. Click "View Details" to view current Clearance\'s Status.</p><p><span class="n">2</span><span class="bd s1">For Receiving</span> - The request is currently in Receiving Window and waiting for the client\'s submission of requirements.</p><p><span class="n">3</span><span class="bd s2">For Evaluation/Processing</span> - Evaluation and Processing of records and required documents for releasing.</p><p><span class="n">4</span><span class="bd s3">Ready for Pickup</span> - The requested document/s is/are already available for pickup at the releasing section of the Registrar.</p><p><span class="n">5</span><span class="bd s4">&#10003; Released</span> - The requested document/s was/were claimed.</p>');
+  }
+  function inst() {
+      md("Instructions", '<ol style="padding-left:18px;line-height:1.7"><li>Click <b>Register</b> and create your account.</li><li><b>Login</b> and submit a Document Request.</li><li>Submit requirements when status is <b>For Receiving</b>.</li><li>Monitor your request until <b>Ready for Pickup</b>.</li><li>Claim your document at the Registrar\'s Office with a valid ID.</li></ol>');
+  }
+  function terms() {
+      md("Terms of Use & Privacy Statement", '<p>By using this service, you agree to provide accurate information. Your data is collected only to process your document requests, in line with the Data Privacy Act of 2012 (RA 10173), and will not be shared with third parties without consent.</p><p>Requests with incomplete or invalid requirements are deleted after 90 days.</p>');
+      return false;
+  }
+  function forgot() {
+      var em = $("l_e").value.trim().toLowerCase(), u = ld("odrs_u", []);
+      var m = u.filter(function (x) {
+          return x.email == em;
+      })[0];
+      $("le").className = m ? "ok" : "err";
+      $("le").textContent = m ? "Recovery link sent to " + em + " (demo)." : "Enter your registered email above first.";
+      return false;
+  }
+  function opt(el, a, b, sel, ph) {
+      var h = ph ? '<option value="">' + ph + "</option>" : "";
+      for (var i = a; i <= b; i++)
+          h += "<option" + (i == sel ? " selected" : "") + ">" + i + "</option>";
+      el.innerHTML = h;
+  }
+  function buildForm() {
+      var M = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      $("r_m").innerHTML = '<option value="">-Month-</option>' + M.map(function (m, i) {
+          return '<option value="' + (i + 1) + '">' + m + "</option>";
+      }).join("");
+      opt($("r_d"), 1, 31, 0, "-Day-");
+      opt($("r_y"), 1990, 2015, 0, "-Year-");
+      opt($("r_yg"), 2018, 2026, 2026);
+      opt($("r_ya"), 2016, 2026, 2024);
+      opt($("r_jy"), 2010, 2026, 0, "-Select-");
+      opt($("r_ey"), 2004, 2024, 0, "-Select-");
+  }
+  function ps() {
+      var g = document.querySelector("input[name=ps]:checked").value == "Graduated";
+      $("yl").innerHTML = (g ? "Year Graduated:" : "Expected Year of Graduation:") + " <b>*</b>";
+  }
+  function me() {
+      return ld("odrs_u", []).filter(function (x) {
+          return x.email == cur;
+      })[0];
+  }
+  var ROLES = {
+      student: "Learner / Student", registrar: "Registrar Staff", admin: "Admin"
+  }, CODES = {
+      registrar: "REG-2026", admin: "ADMIN-2026"
+  };
+  var AV = ["Personal (On-site)", "Online", "Away"], AVC = ["s4", "s2", "s0"], curv = "pick", flt = "all";
+  var G0 = ["Register an account and log in using your own email address.", "Select the document and state the purpose of the request.", "Turn in the required documents through the private request chat.", "Wait for the staff to set the release date, then monitor your notifications.", "Claim the document at the Registrar's Office with a valid ID."];
+  function seedUsers() {
+      var u = ld("odrs_u", []);
+      if (!u.some(function (x) {
+          return x.role == "admin";
+      })) {
+          u.push({
+              email: "admin@asyncrodocs.ph", pw: "admin123", fn: "System", ln: "Admin", role: "admin", mob: "09000000000", emp: "A-001"
+          }, {
+              email: "registrar@asyncrodocs.ph", pw: "registrar123", fn: "Registrar", ln: "Staff", role: "registrar", mob: "09000000001", emp: "R-001"
+          });
+          sv("odrs_u", u);
+      }
+  }
+
+  /* ===== Utilities ===== */
+
+  function esc(t) {
+      return String(t).replace(/[&<>"]/g, function (c) {
+          return {
+              "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"
+          }[c];
+      });
+  }
+  function rl(u) {
+      return u.role || "student";
+  }
+  function stf() {
+      var m = me();
+      return !!m && rl(m) != "student";
+  }
+  function now() {
+      return new Date().toLocaleString();
+  }
+  function fd(d) {
+      return new Date(d + "T00:00").toLocaleDateString(undefined, {
+          year: "numeric", month: "long", day: "numeric"
+      });
+  }
+  function allr() {
+      return ld("odrs_r", []).map(function (x) {
+          x.paid = true;
+          return x;
+      });
+  }
+  function find(id) {
+      return allr().filter(function (x) {
+          return x.id == id;
+      })[0];
+  }
+  function mut(id, f) {
+      var a = allr();
+      a.forEach(function (x) {
+          if (x.id == id)
+              f(x);
+      });
+      sv("odrs_r", a);
+  }
+
+  /* ===== Notifications ===== */
+
+  function notify(to, t) {
+      var n = ld("odrs_n", []);
+      n.push({
+          to: to, t: t, ts: now(), r: 0
+      });
+      sv("odrs_n", n);
+  }
+  function mine() {
+      var s = stf();
+      return ld("odrs_n", []).filter(function (n) {
+          return n.to == cur || (n.to == "staff" && s);
+      });
+  }
+  function G() {
+      return ld("odrs_g", G0);
+  }
+
+  /* ===== Navigation & routing ===== */
+
+  function go(v) {
+      if (v == "dash" && !me()) {
+          cur = null;
+          sv("odrs_cur", "");
+          toast("Please login or register first to request a document.");
+          setTimeout(login, 60);
+          v = "home";
+      }
+      curv = v;
+      ["pick", "home", "reg", "dash"].forEach(function (x) {
+          $(x).classList.toggle("hide", x != v);
+      });
+      $("back").style.visibility = v == "pick" ? "hidden" : "visible";
+      if (v == "pick")
+          $("back").onclick = function () {
+              location.reload();
+          };
+      else
+          $("back").onclick = function () {
+              go(cur ? "dash" : v == "home" ? "pick" : "home");
+          };
+      $("ttl").textContent = v == "pick" ? "AsynchroDocs" : "AsynchroDocs";
+      nav(v);
+      if (v == "dash")
+          render();
+      window.scrollTo(0, 0);
+  }
+  function start() {
+      if (me())
+          go("dash");
+      else {
+          toast("Please login or register first to request a document.");
+          login();
+      }
+  }
+  function notifs() {
+      var a = mine().slice().reverse(), all = ld("odrs_n", []), s = stf();
+      all.forEach(function (n) {
+          if (n.to == cur || (n.to == "staff" && s))
+              n.r = 1;
+      });
+      sv("odrs_n", all);
+      md("Notifications", a.length ? a.map(function (n) {
+          return '<div class="box"><div>' + n.t + "</div><small>" + n.ts + "</small></div>";
+      }).join("") : "<p>No notifications yet.</p>");
+      nav(curv);
+  }
+
+  /* ===== Authentication ===== */
+
+  function login() {
+      md("Login", '<form onsubmit="return dologin(event)"><b>Login as:</b><select id="l_r" style="margin:4px 0 10px"><option value="student">Learner / Student</option><option value="registrar">Registrar Staff</option><option value="admin">Admin</option></select><b>Username:</b> <small>(Email)</small><input id="l_e" type="email" placeholder="Email" style="margin:4px 0 10px"><b>Password:</b><input id="l_p" type="password" placeholder="Password" style="margin-top:4px"><label style="font-weight:400;font-size:12px"><input type="checkbox" onchange="shp(this)">Show password</label><div style="text-align:right"><a href="#" style="color:var(--pri)" onclick="return forgot()">I forgot my username/password</a></div><p class="err" id="le"></p></form>', '<button class="btn" onclick="cl();go(\'reg\')">Register</button> <button class="btn r" onclick="dologin()">Login</button>');
+  }
+  function dologin(e) {
+      if (e)
+          e.preventDefault();
+      var em = $("l_e").value.trim().toLowerCase(), pw = $("l_p").value, r = $("l_r").value;
+      var m = ld("odrs_u", []).filter(function (x) {
+          return x.email == em && x.pw == pw;
+      })[0];
+      if (!m) {
+          $("le").textContent = "Invalid email or password.";
+          return false;
+      }
+      if (rl(m) != r) {
+          $("le").textContent = "This account is registered as " + ROLES[rl(m)] + ". Select the correct role.";
+          return false;
+      }
+      if (m.off) {
+          $("le").textContent = "This account has been deactivated by the Admin.";
+          return false;
+      }
+      cur = m.email;
+      sv("odrs_cur", cur);
+      cl();
+      go("dash");
+      toast("Welcome, " + m.fn + "!");
+      return false;
+  }
+  function out() {
+      cur = null;
+      sv("odrs_cur", "");
+      go("home");
+      toast("Logged out");
+  }
+
+  /* ===== Registration ===== */
+
+  function setRole() {
+      var r = $("r_role").value, s = r == "student";
+      $("stf").classList.toggle("hide", s);
+      $("stux").classList.toggle("hide", !s);
+      $("edu").classList.toggle("hide", !s);
+      $("c1w").classList.toggle("hide", !s);
+  }
+  function reg(e) {
+      e.preventDefault();
+      var g = function (i) {
+          return $(i).value.trim();
+      }, er = $("rerr"), u = ld("odrs_u", []), em = g("r_email").toLowerCase(), r = $("r_role").value, s = r == "student";
+      function bad(m) {
+          er.textContent = m;
+          er.scrollIntoView({
+              block: "center"
+          });
+          return false;
+      }
+      if (!/^\S+@\S+\.\S+$/.test(em))
+          return bad("Enter a valid email address.");
+      if (em != g("r_email2").toLowerCase())
+          return bad("Email addresses do not match.");
+      if ($("r_pw").value.length < 6)
+          return bad("Password must be at least 6 characters.");
+      if ($("r_pw").value != $("r_pw2").value)
+          return bad("Passwords do not match.");
+      if (!/^(09|\+639)\d{9}$/.test(g("r_mob").replace(/[\s-]/g, "")))
+          return bad("Enter a valid mobile number (09XXXXXXXXX).");
+      if (!g("r_ln") || !g("r_fn"))
+          return bad("Last name and first name are required.");
+      if (!$("r_nomn").checked && !g("r_mn"))
+          return bad("Enter middle name or check \"I don't have middle name\".");
+      if (s) {
+          if (!$("r_m").value || !$("r_d").value || !$("r_y").value)
+              return bad("Select your complete date of birth.");
+          if (!g("r_ad"))
+              return bad("Permanent address is required.");
+          if (!$("r_st").value)
+              return bad("Select your strand / track.");
+          if (!/^\d{12}$/.test(g("r_lrn")))
+              return bad("LRN must be 12 digits.");
+          if (!g("r_jhs") || !$("r_jy").value || !g("r_el") || !$("r_ey").value)
+              return bad("Complete your JHS and Elementary details.");
+          if (!$("c1").checked)
+              return bad("Please check all required boxes.");
+      }
+      else {
+          if (!g("r_emp"))
+              return bad("Employee ID is required.");
+          if (g("r_code") != CODES[r])
+              return bad("Invalid access code for " + ROLES[r] + ".");
+      }
+      if (!$("c2").checked || !$("c3").checked)
+          return bad("Please check all required boxes.");
+      if (u.some(function (x) {
+          return x.email == em;
+      }))
+          return bad("Email already registered. Please login.");
+      var o = {
+          email: em, pw: $("r_pw").value, fn: g("r_fn"), ln: g("r_ln"), mn: g("r_mn"), mob: g("r_mob"), role: r
+      };
+      if (s) {
+          o.lrn = g("r_lrn");
+          o.st = $("r_st").value;
+          o.yg = $("r_yg").value;
+      }
+      else
+          o.emp = g("r_emp");
+      u.push(o);
+      sv("odrs_u", u);
+      er.textContent = "";
+      $("rf").reset();
+      setRole();
+      toast("Account created! You can now login.");
+      go("home");
+      login();
+      return false;
+  }
+  function fee() {
+      var d = DOCS[$("q_doc").value];
+      $("q_rq").textContent = "Requirements: valid ID, proof of payment" + (/Replacement/.test(d[0]) ? ", affidavit of loss" : "") + (/CAV/.test(d[0]) ? ", original document to be authenticated" : "") + ".";
+  }
+  function avList() {
+      var a = ld("odrs_av", {});
+      return ld("odrs_u", []).filter(function (x) {
+          return rl(x) != "student" && !x.off;
+      }).map(function (x) {
+          var v = a[x.email] || 2;
+          return '<div class="r1" style="padding:5px 0"><span>' + esc(x.fn + " " + x.ln) + " <small>(" + ROLES[rl(x)] + ')</small></span><span class="bd ' + AVC[v] + '">' + AV[v] + "</span></div>";
+      }).join("");
+  }
+
+  /* ===== Dashboards ===== */
+
+  function render() {
+      var m = me();
+      if (!m) {
+          cur = null;
+          return go("home");
+      }
+      var r = rl(m), s = r == "student";
+      $("wl").textContent = (s ? "Welcome, " : ROLES[r] + ": ") + m.fn + " " + m.ln;
+      $("wl2").textContent = s ? "LRN: " + m.lrn + " \u2022 " + m.st : "Employee ID: " + (m.emp || "-");
+      $("dbody").innerHTML = s ? stuView() : staffView();
+      if (s)
+          fee();
+      nav(curv);
+      var b = $("lc_box");
+      if (b)
+          b.scrollTop = 1e6;
+  }
+  function stuView() {
+      var r = allr().filter(function (x) {
+          return x.u == cur;
+      }).reverse();
+      return '<h3>Registrar Availability</h3><div class="card">' + (avList() || "<small>No staff available.</small>") + '</div><div class="a" style="display:flex;gap:6px;margin:8px 0"><button class="btn" onclick="guide()">&#128214; Process Guidance</button><button class="btn x" onclick="flow()">Status Flow</button></div><h3>New Document Request</h3><form onsubmit="return newreq(event)"><label>Document</label><select id="q_doc" onchange="fee()">' + DOCS.map(function (d, i) {
+          return '<option value="' + i + '">' + d[0] + "</option>";
+      }).join("") + '</select><div class="row"><div><label>Copies</label><input id="q_n" type="number" min="1" max="10" value="1" oninput="fee()"></div><div><label>Claim method</label><select id="q_cl"><option>Pick-up at Registrar</option><option>Authorized representative</option></select></div></div><label>Purpose</label><input id="q_pu" placeholder="e.g. College enrollment, employment"><p id="q_rq" style="font-size:12px;color:var(--mut)"></p><button class="btn lg" type="submit">Submit Request</button></form>' + lcBox() + '<h3 style="margin-top:22px">My Requests</h3>' + (r.length ? r.map(function (x) {
+          return rcard(x, 0);
+      }).join("") : '<p style="color:var(--mut)">No requests yet. Submit your first request above.</p>');
+  }
+  function staffView() {
+      var m = me(), a = ld("odrs_av", {})[cur] || 2, al = allr(), c = function (i) {
+          return al.filter(function (x) {
+              return x.paid && x.s == i;
+          }).length;
+      };
+      var h = '<h3>My Availability</h3><div class="card"><div class="a" style="display:flex;gap:6px;flex-wrap:wrap;margin:0">' + AV.map(function (v, i) {
+          return '<button class="btn ' + (i == a ? AVC[i] : "x") + '" onclick="setav(' + i + ')">' + v + "</button>";
+      }).join("") + '</div><small>Learners see this status on their dashboard.</small></div>';
+      if (rl(m) == "admin")
+          h += '<div style="display:flex;gap:6px;margin:8px 0"><button class="btn" onclick="users()">&#128101; Manage Users</button><button class="btn" onclick="gman()">&#128214; Manage Guidelines</button></div>';
+      h += inbox() + '<h3>Request Overview</h3><div class="row" style="flex-wrap:wrap">' + ST.map(function (s, i) {
+          return '<div class="card" style="flex:1;min-width:90px;text-align:center"><b>' + c(i) + "</b><br><small>" + s + "</small></div>";
+      }).join("") + '</div><h3>Document Requests</h3><select onchange="flt=this.value;render()" style="margin-bottom:8px"><option value="all">All requests</option>' + ST.map(function (s, i) {
+          return '<option value="' + i + '"' + (flt == i ? " selected" : "") + ">" + s + "</option>";
+      }).join("") + "</select>";
+      var l = al.filter(function (x) {
+          return flt == "all" || (flt == "p" ? !x.paid : x.paid && x.s == +flt);
+      }).reverse();
+      return h + (l.length ? l.map(function (x) {
+          return rcard(x, 1);
+      }).join("") : '<p style="color:var(--mut)">No requests found.</p>');
+  }
+  function rcard(x, st) {
+      var c = x.paid ? ["s0", "s1", "s2", "s3", "s4"][x.s] : "sp", t = x.paid ? ST[x.s] : "For Payment", i = esc(x.id);
+      var h = '<div class="card"><div class="r1"><b>' + x.doc + '</b><span class="bd ' + c + '">' + t + "</span></div><small>" + i + " \u2022 " + (st ? esc(x.name) + " \u2022 " : "") + x.dt + " \u2022 " + x.n + " copy/ies" + (x.due ? " \u2022 Release: " + fd(x.due) : "") + '</small><div class="a"><button class="btn" onclick="view(\'' + i + '\')">View Details</button><button class="btn o" onclick="chat(\'' + i + '\')">&#128172; Chat' + (st ? "" : " / Turn In") + "</button>";
+      if (st)
+          h += '<select style="width:auto" onchange="setst(\'' + i + '\',this.value)">' + ST.map(function (s, k) {
+              return '<option value="' + k + '"' + (x.paid && k == x.s ? " selected" : "") + ">" + s + "</option>";
+          }).join("") + "</select>";
+      else {
+          if (x.s < 2)
+              h += '<button class="btn r" onclick="del(\'' + i + '\')">Cancel</button>';
+      }
+      return h + "</div></div>";
+  }
+  function setav(i) {
+      var a = ld("odrs_av", {});
+      a[cur] = i;
+      sv("odrs_av", a);
+      render();
+      toast("Status: " + AV[i]);
+  }
+
+  /* ===== Document requests ===== */
+
+  function newreq(e) {
+      e.preventDefault();
+      var m = me();
+      if (!m || rl(m) != "student") {
+          toast("Login as a Learner to request documents.");
+          return false;
+      }
+      var n = Math.min(10, Math.max(1, +$("q_n").value || 1)), d = DOCS[$("q_doc").value], all = allr(), id = "ASD-" + new Date().getFullYear() + "-" + String(all.length + 1).padStart(5, "0");
+      all.push({
+          id: id, u: cur, name: m.fn + " " + m.ln, doc: d[0], n: n, fee: d[1] * n, cl: $("q_cl").value, pu: esc($("q_pu").value.trim() || "-"), paid: false, s: 0, dt: new Date().toLocaleDateString(), msgs: [], due: ""
+      });
+      sv("odrs_r", all);
+      notify("staff", "New request " + id + " from " + esc(m.fn + " " + m.ln) + ": " + d[0]);
+      notify(cur, "Request " + id + " submitted. Please turn in your requirements through the request chat.");
+      render();
+      toast("Request submitted. Please pay to proceed.");
+      return false;
+  }
+  function view(id) {
+      var x = find(id);
+      md("Request Details", "<p><b>" + x.id + "</b></p><p>" + x.doc + "<br>Student: " + esc(x.name) + "<br>Copies: " + x.n + "<br>Purpose: " + x.pu + "<br>Claim: " + x.cl + "<br>Release date: " + (x.due ? fd(x.due) : "Not yet set") + "</p>" + ST.map(function (s, i) {
+          return '<div style="opacity:' + (x.paid && i <= x.s ? 1 : .4) + '"><span class="n">' + (i + 1) + "</span>" + s + (x.paid && i == x.s ? " \u2190 current" : "") + "</div>";
+      }).join(""));
+  }
+  function del(id) {
+      md("Cancel request", "Cancel request " + id + "?", '<button class="btn x" onclick="cl()">No</button> <button class="btn r" onclick="sv(\'odrs_r\',allr().filter(function(x){return x.id!=\'' + id + '\'}));cl();render();toast(\'Request cancelled\')">Yes, cancel</button>');
+  }
+  function setst(id, v) {
+      v = +v;
+      var x = find(id);
+      mut(id, function (r) {
+          r.s = v;
+          if (v >= 1)
+              r.paid = true;
+          r.msgs.push({
+              e: "sys", n: "System", t: "Status updated to " + ST[v] + " by " + esc(me().fn), ts: now()
+          });
+      });
+      notify(x.u, "Your request " + id + " is now: " + ST[v]);
+      render();
+      toast("Status: " + ST[v]);
+  }
+
+  /* ===== Per-request private chat ===== */
+
+  function chat(id) {
+      var x = find(id), m = me(), s = rl(m) != "student";
+      var ms = (x.msgs || []).map(function (g) {
+          return '<div class="bub' + (g.e == cur ? " me" : "") + '"><small>' + g.n + " \u2022 " + g.ts + "</small><div>" + g.t + "</div></div>";
+      }).join("") || '<p style="color:var(--mut);margin:0">No messages yet. Start the private conversation.</p>';
+      var ex = s ? '<label>Document release / turn-in date</label><div class="row"><input type="date" id="c_d" value="' + (x.due || "") + '"><button class="btn g" style="flex:0 0 auto" onclick="setdue(\'' + id + '\')">Set</button></div>' : (x.paid && x.s == 1 ? '<label>Turn in requirements</label><input type="file" id="c_f" multiple><button class="btn g" style="margin-top:6px" onclick="turnin(\'' + id + '\')">Turn In</button>' : "");
+      md(id + " - Private Chat", "<small>" + x.doc + " \u2022 " + esc(x.name) + '</small><div class="chat" id="cb">' + ms + "</div>" + (x.due ? '<p class="ok">Document release date: ' + fd(x.due) + "</p>" : "") + ex + '<div class="row" style="margin-top:8px"><input id="c_t" placeholder="Type a message..." onkeydown="if(event.key==\'Enter\')send(\'' + id + '\')"><button class="btn" style="flex:0 0 auto" onclick="send(\'' + id + '\')">Send</button></div>');
+      $("cb").scrollTop = 1e6;
+  }
+  function post(id, t, sys) {
+      var m = me();
+      mut(id, function (r) {
+          r.msgs.push({
+              e: sys ? "sys" : cur, n: sys ? "System" : esc(m.fn) + (rl(m) == "student" ? "" : " (" + ROLES[rl(m)] + ")"), t: t, ts: now()
+          });
+      });
+  }
+  function ping(id, t) {
+      var x = find(id);
+      notify(rl(me()) == "student" ? "staff" : x.u, t);
+  }
+  function send(id) {
+      var t = $("c_t").value.trim();
+      if (!t)
+          return;
+      post(id, esc(t));
+      ping(id, "New message on " + id + " from " + esc(me().fn));
+      chat(id);
+      nav(curv);
+  }
+  function setdue(id) {
+      var d = $("c_d").value;
+      if (!d) {
+          toast("Pick a date first");
+          return;
+      }
+      mut(id, function (r) {
+          r.due = d;
+      });
+      post(id, "Release date set to " + fd(d), 1);
+      notify(find(id).u, "Release date for " + id + ": " + fd(d));
+      chat(id);
+      render();
+  }
+  function turnin(id) {
+      var f = $("c_f").files;
+      if (!f.length) {
+          toast("Attach at least one file");
+          return;
+      }
+      var n = [].map.call(f, function (x) {
+          return esc(x.name);
+      }).join(", ");
+      mut(id, function (r) {
+          r.s = 2;
+      });
+      post(id, "Turned in requirements: " + n, 1);
+      ping(id, "Requirements turned in for " + id);
+      chat(id);
+      render();
+      toast("Turned in successfully");
+  }
+
+  /* ===== Guidelines & user management ===== */
+
+  function guide() {
+      var g = G();
+      md("Process Guidance", '<ol style="padding-left:18px;line-height:1.7">' + g.map(function (x) {
+          return "<li>" + esc(x) + "</li>";
+      }).join("") + "</ol><p><b>Standard requirements:</b> valid ID, proof of payment, authorization letter (if claimed by a representative).</p>");
+  }
+  function gman() {
+      md("Manage Guidelines", G().map(function (x, i) {
+          return '<div class="r1" style="padding:4px 0"><span>' + (i + 1) + ". " + esc(x) + '</span><button class="btn r" onclick="gdel(' + i + ')">&times;</button></div>';
+      }).join("") + '<div class="row" style="margin-top:8px"><input id="g_t" placeholder="New guideline"><button class="btn g" style="flex:0 0 auto" onclick="gadd()">Add</button></div>');
+  }
+  function gadd() {
+      var t = $("g_t").value.trim();
+      if (!t)
+          return;
+      var g = G();
+      g.push(t);
+      sv("odrs_g", g);
+      gman();
+  }
+  function gdel(i) {
+      var g = G();
+      g.splice(i, 1);
+      sv("odrs_g", g);
+      gman();
+  }
+  function users() {
+      md("Manage Users", ld("odrs_u", []).map(function (x) {
+          return '<div class="r1" style="padding:5px 0"><span>' + esc(x.fn + " " + x.ln) + "<br><small>" + esc(x.email) + " \u2022 " + ROLES[rl(x)] + (x.off ? " \u2022 Deactivated" : "") + "</small></span>" + (x.email == cur ? "" : '<button class="btn ' + (x.off ? "g" : "r") + '" onclick="utog(\'' + esc(x.email) + '\')">' + (x.off ? "Activate" : "Deactivate") + "</button>") + "</div>";
+      }).join(""));
+  }
+  function utog(em) {
+      var u = ld("odrs_u", []);
+      u.forEach(function (x) {
+          if (x.email == em)
+              x.off = !x.off;
+      });
+      sv("odrs_u", u);
+      users();
+  }
+  function isDark() {
+      var t = document.documentElement.getAttribute("data-theme");
+      return t ? t == "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
+  }
+  function paintTheme() {
+      var b = document.getElementById("thm");
+      if (b)
+          b.innerHTML = isDark() ? "&#9728;&#65039;" : "&#127769;";
+      b && (b.title = isDark() ? "Switch to light mode" : "Switch to dark mode");
+  }
+
+  /* ===== Theme (light / dark) ===== */
+
+  function theme() {
+      var t = isDark() ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", t);
+      try {
+          localStorage.setItem("odrs_theme", t);
+      }
+      catch (e) {
+      }
+      paintTheme();
+  }
+  function initTheme() {
+      var t = null;
+      try {
+          t = localStorage.getItem("odrs_theme");
+      }
+      catch (e) {
+      }
+      if (t)
+          document.documentElement.setAttribute("data-theme", t);
+      paintTheme();
+  }
+  function nav(v) {
+      var h = "";
+      if (me()) {
+          var c = mine().filter(function (x) {
+              return !x.r;
+          }).length;
+          h = '<button class="btn x ib" onclick="notifs()" aria-label="Notifications">&#128276;' + (c ? '<span class="cnt">' + c + "</span>" : "") + "</button>";
+      }
+      $("nav").innerHTML = h + '<button class="btn x ib" onclick="menu()" aria-label="Menu">&#9776;</button>';
+  }
+  function menu() {
+      var m = me(), b = function (t, f, c) {
+          return '<button class="btn ' + (c || "") + ' lg" style="width:100%;margin:4px 0" onclick="cl();' + f + '">' + t + "</button>";
+      };
+      md("Menu", (m ? b("Dashboard", "go('dash')") + b("Notifications", "notifs()", "x") + b("Logout", "out()", "r") : b("Login", "login()", "r") + b("Register", "go('reg')")) + b("Home", "go('home')", "x"));
+  }
+  var sel = null;
+
+  /* ===== Messages: learner / staff inbox ===== */
+
+  function C() {
+      return ld("odrs_c", {});
+  }
+  function thread(e) {
+      return C()[e] || [];
+  }
+  function msgHtml(a) {
+      return a.map(function (g) {
+          return '<div class="bub' + (g.e == cur ? " me" : "") + '"><small>' + esc(g.n) + (g.rl && g.rl != "student" ? " (" + ROLES[g.rl] + ")" : "") + " \u2022 " + g.ts + "</small>" + (g.rq ? "<small>Re: " + esc(g.rq) + "</small>" : "") + "<div>" + g.t + "</div></div>";
+      }).join("") || '<p style="color:var(--mut);margin:0">No messages yet. Say hello!</p>';
+  }
+  function paintC() {
+      var e = stf() ? sel : cur, h = msgHtml(thread(e));
+      ["lc_box", "sc_box"].forEach(function (i) {
+          var b = $(i);
+          if (b) {
+              b.innerHTML = h;
+              b.scrollTop = 1e6;
+          }
+      });
+      nav(curv);
+  }
+  function cs(tid, rid) {
+      var t = $(tid).value.trim(), m = me(), e = stf() ? sel : cur;
+      if (!t || !m || !e)
+          return;
+      var c = C();
+      (c[e] = c[e] || []).push({
+          e: cur, n: m.fn + " " + m.ln, rl: rl(m), t: esc(t), ts: now(), rq: rid && $(rid) ? $(rid).value : ""
+      });
+      sv("odrs_c", c);
+      notify(rl(m) == "student" ? "staff" : e, "New message from " + esc(m.fn) + " in Messages");
+      $(tid).value = "";
+      paintC();
+  }
+  function lcBox() {
+      var r = allr().filter(function (x) {
+          return x.u == cur;
+      });
+      if (!r.length)
+          return '<h3>Messages</h3><div class="card"><small>Submit a document request to start a private chat with the Admin and Registrar Staff.</small></div>';
+      return '<h3>Messages</h3><div class="card"><small>Private chat with Admin &amp; Registrar Staff</small><div class="chat" id="lc_box">' + msgHtml(thread(cur)) + '</div><select id="lc_re" style="margin-bottom:6px"><option value="">General message</option>' + r.map(function (x) {
+          return '<option value="' + esc(x.id) + '">Re: ' + esc(x.id) + " - " + x.doc + "</option>";
+      }).join("") + '</select><div class="row"><input id="lc_t" placeholder="Type a message..." onkeydown="if(event.key==\'Enter\')cs(\'lc_t\',\'lc_re\')"><button class="btn" style="flex:0 0 auto" onclick="cs(\'lc_t\',\'lc_re\')">Send</button></div></div>';
+  }
+  function learners() {
+      var s = {};
+      allr().slice().reverse().forEach(function (x) {
+          s[x.u] = 1;
+      });
+      return Object.keys(s);
+  }
+  function who(e) {
+      var p = ld("odrs_u", []).filter(function (x) {
+          return x.email == e;
+      })[0] || {
+          fn: e, ln: ""
+      };
+      return p.fn + " " + p.ln;
+  }
+  function inbox() {
+      var L = learners(), c = C(), al = allr();
+      return "<h3>Learner Inbox</h3>" + (L.length ? L.map(function (e, i) {
+          var rs = al.filter(function (x) {
+              return x.u == e;
+          }), t = c[e] || [], lm = t.length ? t[t.length - 1] : null;
+          return '<div class="card"><div class="r1"><b>' + esc(who(e)) + "</b><small>" + rs.length + " request(s)</small></div>" + rs.map(function (x) {
+              return '<div style="font-size:12px;margin-top:4px">&#128196; ' + x.doc + ' <span class="bd ' + ["s0", "s1", "s2", "s3", "s4"][x.s] + '">' + ST[x.s] + "</span></div>";
+          }).join("") + '<small style="display:block;margin-top:6px">' + (lm ? "Last: " + lm.t.slice(0, 60) : "No messages yet") + '</small><div class="a"><button class="btn o" onclick="openC(' + i + ')">&#128172; Open Chat</button></div></div>';
+      }).join("") : '<div class="card"><small>No learner requests yet.</small></div>');
+  }
+  function openC(i) {
+      var e = learners()[i];
+      sel = e;
+      var rs = allr().filter(function (x) {
+          return x.u == e;
+      });
+      md("Chat - " + who(e), rs.map(function (x) {
+          return '<div class="box" style="margin:4px 0">' + esc(x.id) + " \u2014 " + x.doc + "<br><small>Purpose: " + x.pu + " \u2022 " + ST[x.s] + "</small></div>";
+      }).join("") + '<div class="chat" id="sc_box">' + msgHtml(thread(e)) + '</div><div class="row"><input id="sc_t" placeholder="Reply to learner..." onkeydown="if(event.key==\'Enter\')cs(\'sc_t\')"><button class="btn" style="flex:0 0 auto" onclick="cs(\'sc_t\')">Send</button></div>');
+      $("sc_box").scrollTop = 1e6;
+  }
+  function shp(c) {
+      $("l_p").type = c.checked ? "text" : "password";
+  }
+  function shr(c) {
+      $("r_pw").type = $("r_pw2").type = c.checked ? "text" : "password";
+  }
+  window.addEventListener("storage", function () {
+      if (me() && (stf() ? $("sc_box") : $("lc_box")))
+          paintC();
+      else
+          nav(curv);
+  });
+
+  function tg(b) {
+      var c = b.parentNode.classList.toggle("col");
+      b.setAttribute("aria-label", c ? "Expand" : "Collapse");
+  }
+  /* ===== Initialisation ===== */
+
+  function init() {
+      seedUsers();
+      buildForm();
+      initTheme();
+      cur = ld("odrs_cur", "") || null;
+      go("pick");
+  }
+  init();
+</script></body>
+</html>
